@@ -1,0 +1,3 @@
+#!/bin/bash
+echo -n "killing machine: name=$1"
+sleep 1 
