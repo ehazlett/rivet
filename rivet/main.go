@@ -51,7 +51,6 @@ func main() {
 	}
 	app.Action = run
 
-	log.Infof("rivet version %s", version.FULL_VERSION)
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}

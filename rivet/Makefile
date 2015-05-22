@@ -15,6 +15,9 @@ clean:
 build:
 	@godep go build -a -tags 'netgo' -ldflags "-w -X github.com/ehazlett/rivet/version.GITCOMMIT $(COMMIT) -linkmode external -extldflags -static" .
 
+build-cross:
+	@gox -os="linux darwin windows" -arch="386 amd64" -ldflags "-w -X github.com/ehazlett/rivet/version.GITCOMMIT $(COMMIT)" -output "rivet_{{.OS}}-{{.Arch}}"
+
 image: build
 	@echo Building image $(TAG)
 	@docker build -t ehazlett/rivet:$(TAG) .

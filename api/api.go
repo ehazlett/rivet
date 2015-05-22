@@ -41,6 +41,8 @@ func NewApi(cfg *ApiConfig) *Api {
 }
 
 func (a *Api) doPluginHook(action string, args []string) ([]byte, error) {
+	log.Debugf("running hook: name=%s args=%v", action, args)
+
 	cmdPath, err := exec.LookPath("pluginhook")
 	if err != nil {
 		return nil, err
@@ -74,6 +76,7 @@ func (a *Api) Run() error {
 	router.HandleFunc("/stop", a.stop).Methods("GET")
 	globalMux.Handle("/", router)
 
+	log.Infof("rivet version %s", version.FULL_VERSION)
 	log.Infof("listening: addr=%s", a.config.ListenAddr)
 	return http.ListenAndServe(a.config.ListenAddr, globalMux)
 }
@@ -118,6 +121,17 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// post-create; append the response
+	postRes, err := a.doPluginHook("post_create", args)
+	if err != nil {
+		log.Errorf("post-create error: %s", err)
+	}
+
+	if postRes != nil {
+		res = append([]byte("\n"))
+		res = append(postRes)
 	}
 
 	apiResponse(http.StatusOK, res, w)
