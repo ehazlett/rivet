@@ -92,13 +92,13 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 	storage := r.URL.Query().Get("storage")
 
 	if name == "" || cpu == "" || memory == "" || storage == "" {
-		http.Error(w, "you must specify name, key, cpu, memory and storage params", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify name, key, cpu, memory and storage params"), w)
 		return
 	}
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 	res, err := a.doPluginHook("create", args)
 	if err != nil {
 		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (a *Api) getIP(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -152,7 +152,7 @@ func (a *Api) getIP(w http.ResponseWriter, r *http.Request) {
 	res, err := a.doPluginHook("get_ip", args)
 	if err != nil {
 		log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -163,7 +163,7 @@ func (a *Api) getState(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -173,7 +173,7 @@ func (a *Api) getState(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("get_state", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -184,7 +184,7 @@ func (a *Api) start(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -194,7 +194,7 @@ func (a *Api) start(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("start", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -205,7 +205,7 @@ func (a *Api) kill(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -215,7 +215,7 @@ func (a *Api) kill(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("kill", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -226,7 +226,7 @@ func (a *Api) remove(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -236,7 +236,7 @@ func (a *Api) remove(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("remove", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -247,7 +247,7 @@ func (a *Api) restart(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -257,7 +257,7 @@ func (a *Api) restart(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("restart", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
@@ -268,7 +268,7 @@ func (a *Api) stop(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
 	if name == "" {
-		http.Error(w, "you must specify a machine name", http.StatusBadRequest)
+		apiResponse(http.StatusBadRequest, []byte("you must specify a machine name"), w)
 		return
 	}
 
@@ -278,7 +278,7 @@ func (a *Api) stop(w http.ResponseWriter, r *http.Request) {
 
 	res, err := a.doPluginHook("stop", args)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
 	}
 
