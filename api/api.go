@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
 
 	log "github.com/Sirupsen/logrus"
@@ -55,6 +56,8 @@ func (a *Api) doPluginHook(action string, args []string) ([]byte, error) {
 	cmdArgs = append(cmdArgs, args...)
 
 	cmd := exec.Command(cmdPath, cmdArgs...)
+	// load current environment to get custom settings for plugins
+	cmd.Env = os.Environ()
 	// set PLUGIN_PATH env var
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_PATH=%s", a.config.HooksPath))
 
