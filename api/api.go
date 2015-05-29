@@ -10,6 +10,8 @@ import (
 	"os/exec"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/codegangsta/negroni"
+	"github.com/ehazlett/rivet/auth"
 	"github.com/ehazlett/rivet/version"
 	"github.com/gorilla/mux"
 )
@@ -77,11 +79,23 @@ func (a *Api) Run() error {
 	router.HandleFunc("/remove", a.remove).Methods("GET")
 	router.HandleFunc("/restart", a.restart).Methods("GET")
 	router.HandleFunc("/stop", a.stop).Methods("GET")
-	globalMux.Handle("/", router)
+	// enable auth if token is present
+	if a.config.AuthToken != "" {
+		am := auth.NewAuthMiddleware(a.config.AuthToken)
+		globalMux.Handle("/", negroni.New(
+			negroni.HandlerFunc(am.Handler),
+			negroni.Wrap(http.Handler(router)),
+		))
+	} else {
+
+		globalMux.Handle("/", router)
+	}
 
 	log.Infof("rivet version %s", version.FULL_VERSION)
 	log.Infof("listening: addr=%s", a.config.ListenAddr)
-	return http.ListenAndServe(a.config.ListenAddr, globalMux)
+	n := negroni.New()
+	n.UseHandler(globalMux)
+	return http.ListenAndServe(a.config.ListenAddr, n)
 }
 
 func (a *Api) index(w http.ResponseWriter, r *http.Request) {

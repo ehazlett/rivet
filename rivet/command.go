@@ -16,13 +16,14 @@ func run(c *cli.Context) {
 
 	listenAddr := c.String("listen-addr")
 	hooksPath := c.String("hooks-path")
+	authToken := c.String("auth-token")
 
 	cfg := &api.ApiConfig{
 		ListenAddr: listenAddr,
 		HooksPath:  hooksPath,
+		AuthToken:  authToken,
 	}
 	a := api.NewApi(cfg)
-
 	if err := a.Run(); err != nil {
 		log.Fatal(err)
 	}

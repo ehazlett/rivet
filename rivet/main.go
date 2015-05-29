@@ -44,6 +44,11 @@ func main() {
 			Usage: "Path to hooks directory",
 			Value: filepath.Join(wd, "hooks"),
 		},
+		cli.StringFlag{
+			Name:  "auth-token, t",
+			Usage: "Auth Token (auth disabled if not specified)",
+			Value: "",
+		},
 		cli.BoolFlag{
 			Name:  "debug, D",
 			Usage: "Enable Debug",

@@ -17,6 +17,23 @@ need to build Docker Machine with the
 enables Docker Machine to work with any Rivet endpoint and run the custom
 provisoining hooks.
 
+# Auth
+By default there is no authentication.  However, there is a simple token based
+authentication method available.  Specify your auth token with the `-t` flag
+and send it in the `X-Auth-Token` header when making requests.
+
+Start Rivet API with Token:
+
+```shell
+rivet -p /path/to/plugins --auth-token mysecrettoken
+```
+
+Pass header in requests:
+
+```shell
+curl -H 'X-Auth-Token:mysecrettoken' http://myhost:8080
+```
+
 # Example
 See the [Example](https://github.com/ehazlett/rivet/tree/master/rivet/hooks)
 plugin for the hook definitions.
