@@ -19,7 +19,7 @@ provisoining hooks.
 
 # Auth
 By default there is no authentication.  However, there is a simple token based
-authentication method available.  Specify your auth token with the `-t` flag
+authentication method available.  Specify your auth token with the `--auth-token` flag
 and send it in the `X-Auth-Token` header when making requests.
 
 Start Rivet API with Token:
