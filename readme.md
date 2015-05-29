@@ -15,7 +15,7 @@ sent to pluginhook which then runs the hooks in your custom plugins.  You also
 need to build Docker Machine with the
 [rivet](https://github.com/ehazlett/machine/tree/driver-rivet) driver.  This
 enables Docker Machine to work with any Rivet endpoint and run the custom
-provisoining hooks.
+provisioning hooks.
 
 # Auth
 By default there is no authentication.  However, there is a simple token based
