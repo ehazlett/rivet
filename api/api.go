@@ -43,7 +43,7 @@ func NewApi(cfg *ApiConfig) *Api {
 	}
 }
 
-func (a *Api) doPluginHook(action string, args []string) ([]byte, error) {
+func (a *Api) doPluginHook(action string, args []string, env []string) ([]byte, error) {
 	log.Debugf("running hook: name=%s args=%v", action, args)
 
 	cmdPath, err := exec.LookPath("pluginhook")
@@ -62,6 +62,7 @@ func (a *Api) doPluginHook(action string, args []string) ([]byte, error) {
 	cmd.Env = os.Environ()
 	// set PLUGIN_PATH env var
 	cmd.Env = append(cmd.Env, fmt.Sprintf("PLUGIN_PATH=%s", a.config.HooksPath))
+	cmd.Env = append(cmd.Env, env...)
 
 	return cmd.CombinedOutput()
 }
@@ -107,6 +108,8 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 	cpu := r.URL.Query().Get("cpu")
 	memory := r.URL.Query().Get("memory")
 	storage := r.URL.Query().Get("storage")
+	image := r.URL.Query().Get("image")
+	env := r.URL.Query()["env"]
 
 	if name == "" || cpu == "" || memory == "" || storage == "" {
 		apiResponse(http.StatusBadRequest, []byte("you must specify name, key, cpu, memory and storage params"), w)
@@ -121,8 +124,8 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 
 	key := bytes.NewBuffer(data)
 
-	log.Infof("create: name=%s cpu=%s memory=%s storage=%s",
-		name, cpu, memory, storage)
+	log.Infof("create: name=%s cpu=%s memory=%s storage=%s env=%v",
+		name, cpu, memory, storage, env)
 	log.Debugf("ssh key: %s", key.String())
 
 	args := []string{
@@ -131,9 +134,10 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 		cpu,
 		memory,
 		storage,
+		image,
 	}
 
-	res, err := a.doPluginHook("create", args)
+	res, err := a.doPluginHook("create", args, env)
 	if err != nil {
 		log.Error(err)
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
@@ -141,7 +145,7 @@ func (a *Api) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// post-create; append the response
-	postRes, err := a.doPluginHook("post_create", args)
+	postRes, err := a.doPluginHook("post_create", args, env)
 	if err != nil {
 		log.Errorf("post-create error: %s", err)
 	}
@@ -166,7 +170,9 @@ func (a *Api) getIP(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("get_ip", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("get_ip", args, env)
 	if err != nil {
 		log.Error(err)
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
@@ -188,7 +194,9 @@ func (a *Api) getState(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("get_state", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("get_state", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
@@ -209,7 +217,9 @@ func (a *Api) start(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("start", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("start", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
@@ -230,7 +240,9 @@ func (a *Api) kill(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("kill", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("kill", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
@@ -251,7 +263,9 @@ func (a *Api) remove(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("remove", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("remove", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
@@ -272,7 +286,9 @@ func (a *Api) restart(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("restart", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("restart", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
@@ -293,7 +309,9 @@ func (a *Api) stop(w http.ResponseWriter, r *http.Request) {
 		name,
 	}
 
-	res, err := a.doPluginHook("stop", args)
+	env := []string{}
+
+	res, err := a.doPluginHook("stop", args, env)
 	if err != nil {
 		apiResponse(http.StatusInternalServerError, []byte(err.Error()), w)
 		return
